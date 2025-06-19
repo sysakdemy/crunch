@@ -1,4 +1,5 @@
 FROM python:3.9-alpine
+
 LABEL AUTHOR="Karim Ayari <sysakdemy@gmail.com>"
 WORKDIR /app
 COPY index.html .
