@@ -28,7 +28,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copier le code de l'application
-COPY crunch_web.py .
+COPY crunch.py .
 
 # Changer les permissions
 RUN chown -R crunch:crunch /app
@@ -44,4 +44,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD python -c "import requests; requests.get('http://localhost:5000/health')" || exit 1
 
 # Commande par défaut
-CMD ["python", "crunch_web.py"]
+CMD ["python", "crunch.py"]

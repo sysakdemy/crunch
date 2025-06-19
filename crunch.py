@@ -36,20 +36,15 @@ crunch_state = CrunchState()
 def cpu_worker(worker_id, intensity, stop_event):
     """Worker qui consomme du CPU selon l'intensité définie"""
     print(f"Worker {worker_id} démarré avec intensité {intensity}%")
-    
     intensity_ratio = intensity / 100.0
-    
     while not stop_event.is_set():
         # Période d'activité
         start_time = time.time()
         work_duration = 0.1 * intensity_ratio
-        
         while time.time() - start_time < work_duration and not stop_event.is_set():
-            # Calculs intensifs pour charger le CPU
             for _ in range(10000):
                 x = 3.14159 * 2.71828
                 y = x ** 0.5
-        
         # Période de repos
         if intensity_ratio < 1.0 and not stop_event.is_set():
             rest_duration = 0.1 * (1.0 - intensity_ratio)
@@ -58,78 +53,70 @@ def cpu_worker(worker_id, intensity, stop_event):
 def start_cpu_load(duration, intensity, cores):
     """Démarre le test de charge CPU"""
     global crunch_state
-    
     if crunch_state.is_running:
         return False
-    
     crunch_state.is_running = True
     crunch_state.start_time = datetime.now()
     crunch_state.duration = duration
     crunch_state.intensity = intensity
     crunch_state.cores = cores
     crunch_state.processes = []
-    
-    # Créer l'événement d'arrêt
-    stop_event = threading.Event()
-    
-    # Créer et démarrer les processus workers
+    # Créer et démarrer les processus workers avec multiprocessing.Event
     for i in range(cores):
+        stop_event = multiprocessing.Event()
         process = multiprocessing.Process(
-            target=cpu_worker, 
+            target=cpu_worker,
             args=(i+1, intensity, stop_event)
         )
         process.start()
         crunch_state.processes.append((process, stop_event))
-    
     # Thread pour arrêter automatiquement après la durée
     def auto_stop():
         time.sleep(duration)
         stop_cpu_load()
-    
     timer_thread = threading.Thread(target=auto_stop)
     timer_thread.daemon = True
     timer_thread.start()
-    
     return True
 
 def stop_cpu_load():
     """Arrête le test de charge CPU"""
     global crunch_state
-    
     if not crunch_state.is_running:
         return
-    
     crunch_state.is_running = False
-    
     # Arrêter tous les processus
     for process, stop_event in crunch_state.processes:
         stop_event.set()
-        if process.is_alive():
-            process.terminate()
-    
+        try:
+            if hasattr(process, '_parent_pid') and process._parent_pid == os.getpid():
+                if process.is_alive():
+                    process.terminate()
+        except AssertionError:
+            pass
     # Attendre que les processus se terminent
     for process, _ in crunch_state.processes:
-        process.join(timeout=5)
-        if process.is_alive():
-            process.kill()
-    
+        try:
+            if hasattr(process, '_parent_pid') and process._parent_pid == os.getpid():
+                process.join(timeout=5)
+                if process.is_alive():
+                    process.kill()
+        except AssertionError:
+            pass
     crunch_state.processes = []
     crunch_state.start_time = None
 
 def update_stats():
     """Met à jour les statistiques système"""
     global crunch_state
-    
     try:
         crunch_state.stats['cpu_percent'] = psutil.cpu_percent(interval=1)
         crunch_state.stats['memory_percent'] = psutil.virtual_memory().percent
-        
         if crunch_state.is_running and crunch_state.start_time:
             elapsed = datetime.now() - crunch_state.start_time
             crunch_state.stats['running_time'] = elapsed.total_seconds()
         else:
             crunch_state.stats['running_time'] = 0
-            
     except Exception as e:
         print(f"Erreur lors de la mise à jour des stats: {e}")
 
@@ -137,8 +124,8 @@ def update_stats():
 def index():
     """Page principale"""
     update_stats()
-    return render_template('index.html', 
-                         state=crunch_state, 
+    return render_template('index.html',
+                         state=crunch_state,
                          max_cores=multiprocessing.cpu_count())
 
 @app.route('/start', methods=['POST'])
@@ -148,7 +135,6 @@ def start_load():
         duration = int(request.form.get('duration', 300))
         intensity = int(request.form.get('intensity', 80))
         cores = int(request.form.get('cores', multiprocessing.cpu_count()))
-        
         # Validation
         if not (1 <= duration <= 3600):
             raise ValueError("Durée doit être entre 1 et 3600 secondes")
@@ -156,14 +142,11 @@ def start_load():
             raise ValueError("Intensité doit être entre 1 et 100%")
         if not (1 <= cores <= multiprocessing.cpu_count()):
             raise ValueError(f"Nombre de cœurs doit être entre 1 et {multiprocessing.cpu_count()}")
-        
         success = start_cpu_load(duration, intensity, cores)
-        
         if success:
             return redirect(url_for('index'))
         else:
             return "Un test est déjà en cours", 400
-            
     except Exception as e:
         return f"Erreur: {str(e)}", 400
 
@@ -407,16 +390,12 @@ if __name__ == '__main__':
     os.makedirs('templates', exist_ok=True)
     with open('templates/index.html', 'w', encoding='utf-8') as f:
         f.write(HTML_TEMPLATE)
-    
     # Gestionnaire de signaux
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
-    
     # Lancer l'application
     port = int(os.environ.get('PORT', 5000))
     host = os.environ.get('HOST', '0.0.0.0')
-    
     print(f"🚀 Crunch Web démarré sur http://{host}:{port}")
     print("Utilisez Ctrl+C pour arrêter")
-    
     app.run(host=host, port=port, debug=False)
