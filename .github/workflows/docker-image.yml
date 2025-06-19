@@ -8,7 +8,7 @@ on:
 
 env:
   REGISTRY: ${{ vars.REGISTRY }}
-  IMAGE_NAME: my-app
+  IMAGE_NAME: ${{ github.event.repository.name }}
 
 jobs:
   build-and-push:
