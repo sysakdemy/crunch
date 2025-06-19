@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Test Container</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .app-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            animation: fadeIn 1s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #fff, #f0f0f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .status {
+            font-size: 1.2rem;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: rgba(76, 175, 80, 0.2);
+            border-radius: 10px;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease, background 0.3s ease;
+        }
+
+        .info-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .info-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .test-button {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 1rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .test-button:active {
+            transform: translateY(0);
+        }
+
+        .response-area {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Courier New', monospace;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .footer {
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <h1>🚀 Test Container</h1>
+        
+        <div class="status">
+            ✅ Application fonctionnelle
+        </div>
+
+        <div class="info-grid">
+            <div class="info-card">
+                <div class="info-label">Timestamp</div>
+                <div class="info-value" id="timestamp">--</div>
+            </div>
+            <div class="info-card">
+                <div class="info-label">Requêtes</div>
+                <div class="info-value" id="requests">0</div>
+            </div>
+            <div class="info-card">
+                <div class="info-label">User Agent</div>
+                <div class="info-value" id="userAgent">--</div>
+            </div>
+            <div class="info-card">
+                <div class="info-label">Résolution</div>
+                <div class="info-value" id="resolution">--</div>
+            </div>
+        </div>
+
+        <button class="test-button" onclick="performTest()">
+            🧪 Test de Connexion
+        </button>
+        
+        <button class="test-button" onclick="fetchServerInfo()">
+            📊 Info Serveur
+        </button>
+
+        <div class="response-area" id="responseArea">
+            <div>Cliquez sur un bouton pour commencer les tests...</div>
+        </div>
+
+        <div class="footer">
+            Container Web App • Port: <span id="currentPort">--</span>
+        </div>
+    </div>
+
+    <script>
+        let requestCount = 0;
+
+        // Initialisation
+        function init() {
+            updateTimestamp();
+            updateUserAgent();
+            updateResolution();
+            updatePort();
+            
+            // Mise à jour du timestamp toutes les secondes
+            setInterval(updateTimestamp, 1000);
+        }
+
+        function updateTimestamp() {
+            const now = new Date();
+            document.getElementById('timestamp').textContent = 
+                now.toLocaleTimeString('fr-FR');
+        }
+
+        function updateUserAgent() {
+            const ua = navigator.userAgent;
+            const shortUA = ua.includes('Chrome') ? 'Chrome' : 
+                           ua.includes('Firefox') ? 'Firefox' : 
+                           ua.includes('Safari') ? 'Safari' : 'Autre';
+            document.getElementById('userAgent').textContent = shortUA;
+        }
+
+        function updateResolution() {
+            document.getElementById('resolution').textContent = 
+                `${window.screen.width}x${window.screen.height}`;
+        }
+
+        function updatePort() {
+            document.getElementById('currentPort').textContent = 
+                window.location.port || '80';
+        }
+
+        function updateRequestCount() {
+            requestCount++;
+            document.getElementById('requests').textContent = requestCount;
+        }
+
+        function showResponse(content, isLoading = false) {
+            const area = document.getElementById('responseArea');
+            if (isLoading) {
+                area.innerHTML = `
+                    <div class="loading"></div>
+                    <div style="margin-left: 1rem;">${content}</div>
+                `;
+            } else {
+                area.innerHTML = content;
+            }
+        }
+
+        function performTest() {
+            updateRequestCount();
+            showResponse('Test de connexion en cours...', true);
+            
+            // Simulation d'un test
+            setTimeout(() => {
+                const testResults = {
+                    status: 'OK',
+                    latency: Math.floor(Math.random() * 50) + 10,
+                    timestamp: new Date().toISOString(),
+                    clientIP: 'Masqué pour sécurité',
+                    serverResponse: 'Connexion établie avec succès'
+                };
+
+                const html = `
+                    <div style="text-align: left;">
+                        <strong>🎯 Résultats du Test:</strong><br>
+                        Status: <span style="color: #4CAF50;">${testResults.status}</span><br>
+                        Latence: ${testResults.latency}ms<br>
+                        Horodatage: ${testResults.timestamp}<br>
+                        Réponse: ${testResults.serverResponse}
+                    </div>
+                `;
+                showResponse(html);
+            }, 2000);
+        }
+
+        function fetchServerInfo() {
+            updateRequestCount();
+            showResponse('Récupération des informations serveur...', true);
+            
+            setTimeout(() => {
+                const serverInfo = {
+                    hostname: window.location.hostname,
+                    port: window.location.port || '80',
+                    protocol: window.location.protocol,
+                    path: window.location.pathname,
+                    containerized: 'Probablement (conçu pour)',
+                    networkInterfaces: '0.0.0.0 (toutes interfaces)'
+                };
+
+                const html = `
+                    <div style="text-align: left;">
+                        <strong>🖥️ Informations Serveur:</strong><br>
+                        Hostname: ${serverInfo.hostname}<br>
+                        Port: ${serverInfo.port}<br>
+                        Protocole: ${serverInfo.protocol}<br>
+                        Chemin: ${serverInfo.path}<br>
+                        Container: ${serverInfo.containerized}<br>
+                        Interfaces: ${serverInfo.networkInterfaces}
+                    </div>
+                `;
+                showResponse(html);
+            }, 1500);
+        }
+
+        // Démarrage de l'application
+        window.addEventListener('load', init);
+
+        // Ajout d'événements pour démontrer l'interactivité
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                performTest();
+            }
+        });
+
+        // Easter egg
+        let konamiCode = [];
+        const konamiSequence = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight'];
+        
+        document.addEventListener('keydown', function(e) {
+            konamiCode.push(e.key);
+            if (konamiCode.length > konamiSequence.length) {
+                konamiCode.shift();
+            }
+            
+            if (JSON.stringify(konamiCode) === JSON.stringify(konamiSequence)) {
+                showResponse(`
+                    <div style="text-align: center; color: #FFD700;">
+                        🎊 KONAMI CODE ACTIVÉ! 🎊<br>
+                        Mode développeur débloqué!<br>
+                        <small>Vous êtes un vrai geek! 🤓</small>
+                    </div>
+                `);
+                konamiCode = [];
+            }
+        });
+    </script>
+</body>
+</html>
