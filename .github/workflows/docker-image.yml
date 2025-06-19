@@ -53,3 +53,18 @@ jobs:
 
     - name: Output image digest
       run: echo "Image pushed with digest ${{ steps.build.outputs.digest }}"
+    
+    - name: Set up kubectl
+      uses: azure/setup-kubectl@v4
+      with:
+        version: 'latest'
+
+    - name: Get GKE credentials
+      uses: google-github-actions/get-gke-credentials@v2
+      with:
+        cluster_name: ${{ secrets.GKE_CLUSTER }}
+        location: ${{ secrets.GKE_ZONE }}
+        project_id: ${{ secrets.GKE_PROJECT }}
+
+    - name: Deploy to GKE
+      run: kubectl apply -f k8s/
