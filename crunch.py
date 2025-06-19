@@ -8,7 +8,6 @@ import threading
 import multiprocessing
 import time
 import psutil
-import json
 from datetime import datetime
 import os
 import signal
@@ -183,7 +182,7 @@ def signal_handler(signum, frame):
     stop_cpu_load()
     sys.exit(0)
 
-# Template HTML intégré
+# Template HTML intégré avec bouton stop
 HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="fr">
@@ -354,15 +353,14 @@ HTML_TEMPLATE = """
                     {% endfor %}
                 </select>
             </div>
-            {% endif %}
-            
             <div class="button-group">
-                {% if state.is_running %}
-                <button type="submit" class="btn-stop">🛑 Arrêter le test</button>
-                {% else %}
                 <button type="submit" class="btn-start">🚀 Lancer le test</button>
-                {% endif %}
             </div>
+            {% else %}
+            <div class="button-group">
+                <button type="submit" class="btn-stop">🛑 Arrêter le test</button>
+            </div>
+            {% endif %}
         </form>
     </div>
     
@@ -386,7 +384,7 @@ HTML_TEMPLATE = """
 """
 
 if __name__ == '__main__':
-    # Créer le template
+    # Créer le template si besoin
     os.makedirs('templates', exist_ok=True)
     with open('templates/index.html', 'w', encoding='utf-8') as f:
         f.write(HTML_TEMPLATE)
