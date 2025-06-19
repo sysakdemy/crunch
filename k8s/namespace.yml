@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: crunch
+  labels:
+    app: crunch
+    app.kubernetes.io/managed-by: cloud-console
+  annotations:
+    cloud-console.io/description: "Crunch namespace for the Crunch application."
