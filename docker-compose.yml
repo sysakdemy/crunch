@@ -3,7 +3,18 @@ services:
   crunch:
     hostname: crunch
     image: crunch:latest
-    #volumes:
-    #  - crunch-data:/data
+    volumes:
+      - crunch-data:/data
     restart: always
-    command: python crunch.py
+  alpine:
+    hostname: alpine
+    image: alpine:latest
+    restart: always
+    command: top
+volumes:
+  crunch-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/karim/Bureau/akdemy/crunch/data

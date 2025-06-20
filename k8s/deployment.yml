@@ -27,11 +27,12 @@ spec:
     spec:
       containers:
       - image: europe-west3-docker.pkg.dev/helpful-mode-462809-b9/default/crunch@sha256:053ffcbef57c480330cd403ebb284d07818921f180ee956d8cc4e2538ab9e94f
-        imagePullPolicy: IfNotPresent
-        name: crunch-sha256-1
+        imagePullPolicy: Always
+        name: crunch-1
         resources:
           limits:
             cpu: "2"
+            memory: 4Gi
             ephemeral-storage: 1Gi
           requests:
             cpu: 500m

@@ -68,3 +68,53 @@ jobs:
 
     - name: Deploy to GKE
       run: kubectl apply -f k8s/
+  
+  update-dns:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Set up gcloud CLI
+      uses: google-github-actions/setup-gcloud@v1
+      with:
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        export_default_credentials: true
+
+    - name: Set up kubectl
+      uses: azure/setup-kubectl@v4
+      with:
+        version: 'latest'
+
+    - name: Configure GKE credentials
+      run: |
+        gcloud container clusters get-credentials ${{ secrets.GKE_CLUSTER_NAME }} --zone ${{ secrets.GKE_ZONE }}
+
+    - name: Get LoadBalancer IP
+      id: get_ip
+      run: |
+        IP=$(kubectl get svc ${{ secrets.SERVICE_NAME }} -n ${{ secrets.NAMESPACE }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+        if [ -z "$IP" ]; then
+          echo "LoadBalancer IP not found"
+          exit 1
+        fi
+        echo "LoadBalancer IP: $IP"
+        echo "ip=$IP" >> $GITHUB_OUTPUT
+
+    - name: Update DNS record
+      run: |
+        ZONE_NAME="${{ secrets.DNS_ZONE }}"
+        DOMAIN_NAME="${{ secrets.DNS_NAME }}"
+        TTL=300
+        IP="${{ steps.get_ip.outputs.ip }}"
+
+        gcloud dns record-sets transaction start --zone=$ZONE_NAME
+
+        # Supprimer l'ancien enregistrement (ignore erreur si pas existant)
+        gcloud dns record-sets transaction remove --zone=$ZONE_NAME --name=$DOMAIN_NAME --type=A --ttl=$TTL $IP || true
+
+        # Ajouter le nouvel enregistrement
+        gcloud dns record-sets transaction add --zone=$ZONE_NAME --name=$DOMAIN_NAME --type=A --ttl=$TTL $IP
+
+        gcloud dns record-sets transaction execute --zone=$ZONE_NAME
