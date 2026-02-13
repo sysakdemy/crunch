@@ -3,7 +3,6 @@ kind: Deployment
 metadata:
   labels:
     app: crunch
-    app.kubernetes.io/managed-by: cloud-console
   name: crunch
   namespace: crunch
 spec:
@@ -13,7 +12,6 @@ spec:
   selector:
     matchLabels:
       app: crunch
-      app.kubernetes.io/managed-by: cloud-console
   strategy:
     rollingUpdate:
       maxSurge: 25%
@@ -23,10 +21,9 @@ spec:
     metadata:
       labels:
         app: crunch
-        app.kubernetes.io/managed-by: cloud-console
     spec:
       containers:
-      - image: europe-west3-docker.pkg.dev/helpful-mode-462809-b9/default/crunch@sha256:053ffcbef57c480330cd403ebb284d07818921f180ee956d8cc4e2538ab9e94f
+      - image: kregistry.ddns.net/default/crunch:latest
         imagePullPolicy: Always
         name: crunch-1
         resources:

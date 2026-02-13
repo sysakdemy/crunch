@@ -3,7 +3,6 @@ kind: HorizontalPodAutoscaler
 metadata:
   labels:
     app: crunch
-    app.kubernetes.io/managed-by: cloud-console
   name: crunch-hpa
   namespace: crunch
 spec:
