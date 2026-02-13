@@ -23,7 +23,8 @@ spec:
         app: crunch
     spec:
       containers:
-      - image: kregistry.ddns.net/default/crunch:latest
+      #- image: kregistry.ddns.net/default/crunch:latest
+      - image: europe-west3-docker.pkg.dev/helpful-mode-462809-b9/default/crunch:latest
         imagePullPolicy: Always
         name: crunch-1
         resources:
