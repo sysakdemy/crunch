@@ -5,13 +5,9 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
     traefik.ingress.kubernetes.io/router.middlewares: default-redirect-https@kubernetescrd
-    field.cattle.io/publicEndpoints: '[{"addresses":["51.68.86.92"],"port":80,"protocol":"HTTP","serviceName":"crunch:crunchsvc","ingressName":"crunch:crunching","hostname":"monapp.ddns.net","path":"/","allNodes":false}]'
-  creationTimestamp: "2026-02-13T15:05:03Z"
   generation: 1
   name: crunch-ingress
   namespace: crunch
-  resourceVersion: "51590889986"
-  uid: 1536c645-377a-4fa9-8415-bd333beb7009
 spec:
   ingressClassName: traefik
   tls:
