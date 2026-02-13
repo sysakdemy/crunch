@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   creationTimestamp: "2026-02-13T15:04:34Z"
-  name: crunchsvc
+  name: crunch-svc
   namespace: crunch
   resourceVersion: "51590882546"
   uid: eb26f0c0-a4fd-47fd-a7e9-3422fa1a88a8
@@ -23,5 +23,3 @@ spec:
     app: crunch
   sessionAffinity: None
   type: ClusterIP
-status:
-  loadBalancer: {}
