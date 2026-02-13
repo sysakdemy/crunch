@@ -12,6 +12,10 @@ metadata:
   uid: 1536c645-377a-4fa9-8415-bd333beb7009
 spec:
   ingressClassName: traefik
+  tls:
+  - hosts:
+    - monapp.ddns.net
+    secretName: crunch-tls
   rules:
   - host: monapp.ddns.net
     http:
