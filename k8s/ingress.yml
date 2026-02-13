@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    field.cattle.io/publicEndpoints: '[{"addresses":["51.68.86.92"],"port":80,"protocol":"HTTP","serviceName":"crunch:crunchsvc","ingressName":"crunch:crunching","hostname":"monapp.ddns.net","path":"/","allNodes":false}]'
+  creationTimestamp: "2026-02-13T15:05:03Z"
+  generation: 1
+  name: crunching
+  namespace: crunch
+  resourceVersion: "51590889986"
+  uid: 1536c645-377a-4fa9-8415-bd333beb7009
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: monapp.ddns.net
+    http:
+      paths:
+      - backend:
+          service:
+            name: crunchsvc
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
+status:
+  loadBalancer:
+    ingress:
+    - ip: 51.68.86.92
