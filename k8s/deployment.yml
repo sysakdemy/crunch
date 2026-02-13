@@ -23,7 +23,7 @@ spec:
         app: crunch
     spec:
       containers:
-      - image: kregistry.ddns.net/default/crunch:latest
+      - image: kregistry.ddns.net/promo2026/crunch:latest
         imagePullPolicy: Always
         name: crunch-1
         resources:
