@@ -2,7 +2,7 @@
 FROM python:3.11-slim
 
 # Métadonnées
-LABEL maintainer="crunch-app"
+LABEL maintainer="Karim Ayari"
 LABEL description="Application web pour tester l'autoscaling Kubernetes"
 
 # Variables d'environnement
