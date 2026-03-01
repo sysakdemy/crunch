@@ -1,0 +1,194 @@
+apiVersion: v1
+items:
+- apiVersion: argoproj.io/v1alpha1
+  kind: Application
+  metadata:
+    annotations:
+      argocd-image-updater.argoproj.io/image-list: myapp=kregistry.ddns.net/promo2026/crunch
+      argocd-image-updater.argoproj.io/myapp.update-strategy: latest
+      argocd-image-updater.argoproj.io/write-back-method: git
+    creationTimestamp: "2026-03-01T20:06:02Z"
+    generation: 20
+    name: crunch
+    namespace: argocd
+    resourceVersion: "15554114899"
+    uid: 47709f36-c73f-45ec-acb1-33adf9eed88a
+  spec:
+    destination:
+      namespace: crunch
+      server: https://kubernetes.default.svc
+    project: default
+    source:
+      directory:
+        jsonnet: {}
+        recurse: true
+      path: k8s
+      repoURL: https://github.com/sysakdemy/crunch.git
+      targetRevision: HEAD
+    syncPolicy:
+      syncOptions:
+      - CreateNamespace=true
+  status:
+    controllerNamespace: argocd
+    health:
+      lastTransitionTime: "2026-03-01T20:08:21Z"
+      status: Suspended
+    history:
+    - deployStartedAt: "2026-03-01T20:07:14Z"
+      deployedAt: "2026-03-01T20:07:15Z"
+      id: 0
+      initiatedBy:
+        automated: true
+      revision: 17f460e26ed3c38afe215ecfeeecfb41c9d247db
+      source:
+        directory:
+          jsonnet: {}
+          recurse: true
+        path: k8s
+        repoURL: https://github.com/sysakdemy/crunch.git
+        targetRevision: HEAD
+    operationState:
+      finishedAt: "2026-03-01T20:07:15Z"
+      message: successfully synced (all tasks run)
+      operation:
+        initiatedBy:
+          automated: true
+        retry:
+          limit: 5
+        sync:
+          revision: 17f460e26ed3c38afe215ecfeeecfb41c9d247db
+          source:
+            directory:
+              jsonnet: {}
+              recurse: true
+            path: k8s
+            repoURL: https://github.com/sysakdemy/crunch.git
+            targetRevision: HEAD
+      phase: Succeeded
+      startedAt: "2026-03-01T20:07:14Z"
+      syncResult:
+        resources:
+        - group: ""
+          hookPhase: Running
+          kind: Namespace
+          message: namespace/crunch created
+          name: crunch
+          namespace: crunch
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: ""
+          hookPhase: Running
+          kind: Service
+          message: service/crunch-svc created
+          name: crunch-svc
+          namespace: crunch
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: apps
+          hookPhase: Running
+          images:
+          - kregistry.ddns.net/promo2026/crunch:latest
+          kind: Deployment
+          message: deployment.apps/crunch created
+          name: crunch
+          namespace: crunch
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: autoscaling
+          hookPhase: Running
+          kind: HorizontalPodAutoscaler
+          message: horizontalpodautoscaler.autoscaling/crunch-hpa created
+          name: crunch-hpa
+          namespace: crunch
+          status: Synced
+          syncPhase: Sync
+          version: v2
+        - group: networking.k8s.io
+          hookPhase: Running
+          kind: Ingress
+          message: ingress.networking.k8s.io/crunch-ingress created
+          name: crunch-ingress
+          namespace: crunch
+          status: Synced
+          syncPhase: Sync
+          version: v1
+        - group: traefik.io
+          hookPhase: Running
+          kind: Middleware
+          message: middleware.traefik.io/redirect-https created
+          name: redirect-https
+          namespace: default
+          status: Synced
+          syncPhase: Sync
+          version: v1alpha1
+        revision: 17f460e26ed3c38afe215ecfeeecfb41c9d247db
+        source:
+          directory:
+            jsonnet: {}
+            recurse: true
+          path: k8s
+          repoURL: https://github.com/sysakdemy/crunch.git
+          targetRevision: HEAD
+    reconciledAt: "2026-03-01T20:14:32Z"
+    resourceHealthSource: appTree
+    resources:
+    - kind: Namespace
+      name: crunch
+      status: Synced
+      version: v1
+    - kind: Service
+      name: crunch-svc
+      namespace: crunch
+      status: Synced
+      version: v1
+    - group: apps
+      kind: Deployment
+      name: crunch
+      namespace: crunch
+      status: Synced
+      version: v1
+    - group: autoscaling
+      kind: HorizontalPodAutoscaler
+      name: crunch-hpa
+      namespace: crunch
+      status: Synced
+      version: v2
+    - group: networking.k8s.io
+      kind: Ingress
+      name: crunch-ingress
+      namespace: crunch
+      status: Synced
+      version: v1
+    - group: traefik.io
+      kind: Middleware
+      name: redirect-https
+      namespace: default
+      status: Synced
+      version: v1alpha1
+    sourceHydrator: {}
+    sourceType: Directory
+    summary:
+      externalURLs:
+      - https://monapp.ddns.net/
+      images:
+      - kregistry.ddns.net/promo2026/crunch:latest
+    sync:
+      comparedTo:
+        destination:
+          namespace: crunch
+          server: https://kubernetes.default.svc
+        source:
+          directory:
+            jsonnet: {}
+            recurse: true
+          path: k8s
+          repoURL: https://github.com/sysakdemy/crunch.git
+          targetRevision: HEAD
+      revision: 17f460e26ed3c38afe215ecfeeecfb41c9d247db
+      status: Synced
+kind: List
+metadata:
+  resourceVersion: ""

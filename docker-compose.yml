@@ -1,20 +1,17 @@
 version: '3'
 services:
   crunch:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      tags:
+        - crunch:latest
     hostname: crunch
     image: crunch:latest
     volumes:
       - crunch-data:/data
+    ports:
+      - "80:5000"
     restart: always
-  alpine:
-    hostname: alpine
-    image: alpine:latest
-    restart: always
-    command: top
 volumes:
   crunch-data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /home/karim/Bureau/akdemy/crunch/data
