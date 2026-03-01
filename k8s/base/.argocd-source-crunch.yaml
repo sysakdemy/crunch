@@ -1,0 +1,3 @@
+kustomize:
+  images:
+  - kregistry.ddns.net/promo2026/crunch:1.0.1
