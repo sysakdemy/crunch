@@ -1,4 +1,4 @@
-name: Build and Deploy to GCR
+name: Build and push to registry
 
 on:
   push:
@@ -21,14 +21,12 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
-    - name: Authenticate to Google Cloud
-      uses: google-github-actions/auth@v2
+    - name: Login to Harbor registry
+      uses: docker/login-action@v3
       with:
-        credentials_json: ${{ secrets.GCP_SA_KEY }}
-
-    - name: Configure Docker for GCR
-      run: |
-        echo '${{ secrets.GCP_SA_KEY }}' | docker login -u _json_key --password-stdin https://${{ vars.REGISTRY }}
+        registry: ${{ vars.REGISTRY }}
+        username: ${{ secrets.HARBOR_USERNAME }}
+        password: ${{ secrets.HARBOR_PASSWORD }}
 
     - name: Extract metadata
       id: meta
@@ -53,68 +51,3 @@ jobs:
 
     - name: Output image digest
       run: echo "Image pushed with digest ${{ steps.build.outputs.digest }}"
-    
-    - name: Set up kubectl
-      uses: azure/setup-kubectl@v4
-      with:
-        version: 'latest'
-
-    - name: Get GKE credentials
-      uses: google-github-actions/get-gke-credentials@v2
-      with:
-        cluster_name: ${{ secrets.GKE_CLUSTER }}
-        location: ${{ secrets.GKE_ZONE }}
-        project_id: ${{ secrets.GKE_PROJECT }}
-
-    - name: Deploy to GKE
-      run: kubectl apply -f k8s/
-  
-  update-dns:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout repo
-      uses: actions/checkout@v3
-
-    - name: Set up gcloud CLI
-      uses: google-github-actions/setup-gcloud@v1
-      with:
-        project_id: ${{ secrets.GCP_PROJECT_ID }}
-        service_account_key: ${{ secrets.GCP_SA_KEY }}
-        export_default_credentials: true
-
-    - name: Set up kubectl
-      uses: azure/setup-kubectl@v4
-      with:
-        version: 'latest'
-
-    - name: Configure GKE credentials
-      run: |
-        gcloud container clusters get-credentials ${{ secrets.GKE_CLUSTER_NAME }} --zone ${{ secrets.GKE_ZONE }}
-
-    - name: Get LoadBalancer IP
-      id: get_ip
-      run: |
-        IP=$(kubectl get svc ${{ secrets.SERVICE_NAME }} -n ${{ secrets.NAMESPACE }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-        if [ -z "$IP" ]; then
-          echo "LoadBalancer IP not found"
-          exit 1
-        fi
-        echo "LoadBalancer IP: $IP"
-        echo "ip=$IP" >> $GITHUB_OUTPUT
-
-    - name: Update DNS record
-      run: |
-        ZONE_NAME="${{ secrets.DNS_ZONE }}"
-        DOMAIN_NAME="${{ secrets.DNS_NAME }}"
-        TTL=300
-        IP="${{ steps.get_ip.outputs.ip }}"
-
-        gcloud dns record-sets transaction start --zone=$ZONE_NAME
-
-        # Supprimer l'ancien enregistrement (ignore erreur si pas existant)
-        gcloud dns record-sets transaction remove --zone=$ZONE_NAME --name=$DOMAIN_NAME --type=A --ttl=$TTL $IP || true
-
-        # Ajouter le nouvel enregistrement
-        gcloud dns record-sets transaction add --zone=$ZONE_NAME --name=$DOMAIN_NAME --type=A --ttl=$TTL $IP
-
-        gcloud dns record-sets transaction execute --zone=$ZONE_NAME
