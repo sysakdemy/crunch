@@ -4,8 +4,20 @@ on:
   push:
     branches: [ main, dev ]
     tags: [ '*' ]
+    paths:
+      - 'Dockerfile'
+      - 'crunch.py'
+      - 'requirements.txt'
+      - 'index.html'
+      - '.github/workflows/docker-image.yml'
   pull_request:
     branches: [ main, dev ]
+    paths:
+      - 'Dockerfile'
+      - 'crunch.py'
+      - 'requirements.txt'
+      - 'index.html'
+      - '.github/workflows/docker-image.yml'
 
 env:
   REGISTRY: ${{ vars.REGISTRY }}
