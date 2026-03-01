@@ -3,7 +3,7 @@ kind: Application
 metadata:
   annotations:
     argocd-image-updater.argoproj.io/image-list: myapp=kregistry.ddns.net/promo2026/crunch
-    argocd-image-updater.argoproj.io/myapp.update-strategy: digest
+    argocd-image-updater.argoproj.io/myapp.update-strategy: semver
     argocd-image-updater.argoproj.io/write-back-method: git
   generation: 20
   name: crunch
