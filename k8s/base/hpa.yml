@@ -6,12 +6,12 @@ metadata:
   name: crunch-hpa
   namespace: crunch
 spec:
-  maxReplicas: 3
+  maxReplicas: 5
   metrics:
   - resource:
       name: cpu
       target:
-        averageUtilization: 60
+        averageUtilization: 50
         type: Utilization
     type: Resource
   minReplicas: 1
