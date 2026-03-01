@@ -292,7 +292,7 @@ HTML_TEMPLATE = """
 </head>
 <body>
     <div class="container">
-        <h1>🚀 Crunch - Test d'Autoscaling</h1>
+        <h1>🚀 DEV - Crunch - Test d'Autoscaling</h1>
         
         <div class="status {{ 'running' if state.is_running else 'stopped' }}">
             {% if state.is_running %}
