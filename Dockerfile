@@ -15,6 +15,7 @@ ENV HOST=0.0.0.0
 RUN apt-get update && apt-get install -y \
     bc \
     procps \
+    vim \
     && rm -rf /var/lib/apt/lists/*
 
 # Créer un utilisateur non-root pour la sécurité
@@ -34,7 +35,7 @@ COPY crunch.py .
 RUN chown -R crunch:crunch /app
 
 # Basculer vers l'utilisateur non-root
-USER crunch
+#USER crunch
 
 # Exposer le port
 EXPOSE 5000
