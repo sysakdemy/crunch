@@ -7,7 +7,6 @@ LABEL description="Application web pour tester l'autoscaling Kubernetes"
 
 # Variables d'environnement
 ENV PYTHONUNBUFFERED=1
-ENV TEST=true
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PORT=5000
 ENV HOST=0.0.0.0
