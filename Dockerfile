@@ -1,5 +1,5 @@
 # Dockerfile pour l'application Crunch
-FROM python:3.11-slim
+FROM python:3.12-slim
 
 # Métadonnées
 LABEL maintainer="Karim Ayari"
@@ -7,6 +7,7 @@ LABEL description="Application web pour tester l'autoscaling Kubernetes"
 
 # Variables d'environnement
 ENV PYTHONUNBUFFERED=1
+ENV TEST=true
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PORT=5000
 ENV HOST=0.0.0.0
