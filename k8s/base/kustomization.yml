@@ -6,7 +6,7 @@ resources:
   - hpa.yml
   - ingress.yml
   - namespace.yml
-  - redirect-https.yml
+  #- redirect-https.yml
   - service.yml
 
 images:
